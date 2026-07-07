@@ -256,7 +256,7 @@
                                 <div id="sim-active-view" class="hidden absolute inset-0">
                                     <!-- Background mock camera feed -->
                                     <div class="w-full h-full bg-slate-900 flex items-center justify-center overflow-hidden relative">
-                                        <img src="https://images.unsplash.com/photo-1506012787146-f92b2d7d6d96?auto=format&fit=crop&q=80&w=800" alt="Mock road camera feed" class="w-full h-full object-cover opacity-60">
+                                        <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800" alt="Mock bus traffic camera feed" class="w-full h-full object-cover opacity-60">
                                         <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
 
                                         <!-- Bounding box 1 -->
@@ -712,23 +712,84 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-950 border-t border-gray-900 py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                <!-- Branding -->
-                <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 rounded-lg bg-brand-500 text-white flex items-center justify-center shadow-lg shadow-brand-500/15">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
+    <footer class="bg-gray-950 border-t border-gray-900 pt-16 pb-12 relative overflow-hidden">
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-brand-500/5 rounded-full filter blur-3xl pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 pb-12 border-b border-gray-900">
+                
+                <!-- Col 1: Platform Brand Profile -->
+                <div class="lg:col-span-2 space-y-5">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-xl bg-brand-500 text-white flex items-center justify-center shadow-lg shadow-brand-500/15">
+                            <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold text-white tracking-tight">Road<span class="text-brand-textPulse">Pulse</span></span>
                     </div>
-                    <span class="text-lg font-bold text-white tracking-tight">Road<span class="text-brand-textPulse">Pulse</span></span>
+                    <p class="text-sm text-gray-400 leading-relaxed max-w-sm">
+                        High-accuracy cloud traffic intelligence. Delivering machine learning video analytics and automated reporting for global road engineers and local planning departments.
+                    </p>
+                    <div class="pt-2">
+                        <span class="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">Systems Status</span>
+                        <div class="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full text-[11px] text-emerald-400">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>All AI Cloud Nodes Operational (99.98% Up)</span>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Footer Text / Links -->
-                <p class="text-sm text-gray-500 text-center md:text-right">
-                    © 2026 RoadPulse Platform. All rights reserved. Transforming raw traffic telemetry worldwide.
-                </p>
+                <!-- Col 2: Platform Links -->
+                <div class="space-y-4">
+                    <h4 class="text-sm font-bold text-white uppercase tracking-wider">Platform</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="#features" class="text-gray-400 hover:text-white transition-colors">Core Features</a></li>
+                        <li><a href="#how-it-works" class="text-gray-400 hover:text-white transition-colors">How It Works</a></li>
+                        <li><a href="#pricing" class="text-gray-400 hover:text-white transition-colors">Pricing Structure</a></li>
+                        <li><a href="#pricing" class="text-gray-400 hover:text-white transition-colors">Free Academic Plan</a></li>
+                        <li><button onclick="startAiSimulation()" class="text-gray-400 hover:text-white transition-colors text-left focus:outline-none">Live Web Sandbox</button></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Target Audiences -->
+                <div class="space-y-4">
+                    <h4 class="text-sm font-bold text-white uppercase tracking-wider">Solutions</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="#customers" class="text-gray-400 hover:text-white transition-colors">Local Government (LGUs)</a></li>
+                        <li><a href="#customers" class="text-gray-400 hover:text-white transition-colors">Traffic Engineering Firms</a></li>
+                        <li><a href="#customers" class="text-gray-400 hover:text-white transition-colors">Universities & Research</a></li>
+                        <li><a href="#customers" class="text-gray-400 hover:text-white transition-colors">Property Developers</a></li>
+                        <li><a href="#customers" class="text-gray-400 hover:text-white transition-colors">Road Contractors</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Compliance & Support -->
+                <div class="space-y-4">
+                    <h4 class="text-sm font-bold text-white uppercase tracking-wider">Resources</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="#" onclick="showToast('Loading API Documentation...')" class="text-gray-400 hover:text-white transition-colors">API & Webhook Docs</a></li>
+                        <li><a href="#" onclick="showToast('SLA metrics are available to Professional tiers.')" class="text-gray-400 hover:text-white transition-colors">SLA & Compliance</a></li>
+                        <li><a href="#" onclick="toggleModal('demo-modal', true)" class="text-gray-400 hover:text-white transition-colors">Partner Program</a></li>
+                        <li><a href="#" onclick="showToast('Help center loaded!')" class="text-gray-400 hover:text-white transition-colors">Developer Help Desk</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Bottom Sub-Footer Bar -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6 pt-8 text-xs text-gray-500">
+                <div class="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2">
+                    <p>© 2026 RoadPulse Traffic Technologies. All rights reserved.</p>
+                    <a href="#" onclick="showToast('Privacy Policy details')" class="hover:text-gray-300 transition-colors">Privacy Policy</a>
+                    <a href="#" onclick="showToast('Terms of Service details')" class="hover:text-gray-300 transition-colors">Terms of Service</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <span class="text-[11px] bg-gray-900 border border-gray-800 px-3 py-1 rounded-md text-gray-400">
+                        Designed for ISO 37122 (Smart Cities Indicators)
+                    </span>
+                </div>
             </div>
         </div>
     </footer>
