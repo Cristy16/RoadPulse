@@ -961,14 +961,28 @@
         }
 
         // Submit actions and show success feedback
+        // Submit actions, save parameters, and redirect to the dashboard file
         function submitForm(event, successMessage) {
             event.preventDefault();
-            // Close all active modals
+            
+            // 1. Gather User Customization details from the form
+            const nameInput = document.getElementById('demo-name')?.value || "Guest User";
+            const orgInput = document.getElementById('demo-org')?.value || "Local Civil Agency";
+
+            // 2. Save details to sessionStorage so dashboard.html can read and display them
+            sessionStorage.setItem('rp_user_name', nameInput);
+            sessionStorage.setItem('rp_user_org', orgInput);
+
+            // 3. Close open modals
             toggleModal('demo-modal', false);
             toggleModal('login-modal', false);
             
-            showToast(successMessage);
-            event.target.reset();
+            // 4. Show toast notification & Redirect to the separate file
+            showToast("Redirecting to your interactive demo dashboard...");
+            
+            setTimeout(() => {
+                window.location.href = 'dashboardDemo.html'; 
+            }, 1200);
         }
 
         // Custom premium toast notifications

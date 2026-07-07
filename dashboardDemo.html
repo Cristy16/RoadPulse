@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadPulse Dashboard Tutorial Walkthrough</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        accent: {
+                            yellow: '#f59e0b',
+                            green: '#10b981',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #030712;
+            color: #f3f4f6;
+            overflow: hidden;
+        }
+        .hud-scanline {
+            background: linear-gradient(
+                to bottom,
+                rgba(2, 132, 199, 0) 0%,
+                rgba(2, 132, 199, 0.15) 10%,
+                rgba(2, 132, 199, 0) 20%
+            );
+            background-size: 100% 10px;
+            animation: scan 6s linear infinite;
+        }
+        @keyframes scan {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+    </style>
+</head>
+<body class="antialiased select-none no-scrollbar h-screen flex flex-col justify-between relative">
+
+    <!-- Top Navigation HUD -->
+    <header class="h-16 border-b border-gray-850 bg-gray-950/90 backdrop-blur px-6 flex items-center justify-between z-40">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-brand-500 text-white flex items-center justify-center shadow-lg shadow-brand-500/20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+            </div>
+            <div>
+                <span class="font-extrabold text-sm tracking-tight text-white">RoadPulse</span>
+                <span class="text-[10px] text-brand-300 ml-2 font-mono uppercase bg-brand-500/10 border border-brand-500/20 px-2 py-0.5 rounded-md">Interactive Walkthrough Sandbox</span>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-6">
+            <div class="text-right hidden sm:block">
+                <span class="block text-xs font-semibold text-white" id="user-display-name">Juan dela Cruz</span>
+                <span class="text-[9px] font-mono text-gray-500 uppercase tracking-wider" id="user-display-org">LGU Coordinator</span>
+            </div>
+            <a href="index.html" class="inline-flex items-center space-x-1.5 text-xs text-gray-400 hover:text-white border border-gray-800 bg-gray-900/50 hover:bg-gray-800 px-3.5 py-1.5 rounded-lg transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                <span>Exit Sandbox</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <main class="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-5 p-5 relative z-15">
+        
+        <!-- Left panel: Camera selection + Guided steps console -->
+        <section class="lg:col-span-4 flex flex-col space-y-4 h-full overflow-y-auto pr-1">
+            
+            <!-- STEP CONSOLE CONTAINER -->
+            <div id="step-guide-card" class="bg-gradient-to-b from-gray-900 to-slate-950 border-2 border-brand-500/60 rounded-2xl p-6 shadow-2xl relative overflow-hidden transition-all duration-300">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-brand-500/5 rounded-full filter blur-xl"></div>
+                
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs uppercase font-extrabold tracking-wider text-brand-400 font-mono" id="step-label">Demo Stage 1 / 4</span>
+                    <span class="text-xs text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-md font-mono" id="tour-percentage">25% Complete</span>
+                </div>
+
+                <h3 class="text-lg font-bold text-white mb-2" id="step-title">Deploy Neural Camera Streams</h3>
+                <p class="text-xs text-gray-300 leading-relaxed mb-6" id="step-description">
+                    Our platform automatically connects to highway endpoints, parsing vehicle volumes, parameters, and averages in real time. Click <strong>"Active Traffic Cam"</strong> to begin.
+                </p>
+
+                <div class="flex items-center justify-between pt-4 border-t border-gray-850">
+                    <button onclick="prevStep()" id="prev-btn" class="text-xs font-semibold text-gray-500 hover:text-white transition-colors disabled:opacity-30 disabled:pointer-events-none" disabled>
+                        ← Back
+                    </button>
+                    <button onclick="nextStep()" id="next-btn" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-lg shadow-brand-500/20 transition-all transform hover:-translate-y-0.5">
+                        Next Step →
+                    </button>
+                </div>
+            </div>
+
+            <!-- CAMERA SELECTION / CHANNELS -->
+            <div id="cam-channel-card" class="bg-gray-900/40 border border-gray-850 rounded-2xl p-5 space-y-4">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-xs font-bold uppercase text-gray-400 tracking-wider">Telemetry Channels</h4>
+                    <span class="inline-flex items-center w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                </div>
+                
+                <div class="space-y-2.5">
+                    <!-- Cam list item 1 -->
+                    <button onclick="selectCamera('A1')" id="cam-btn-A1" class="w-full text-left bg-gray-950/80 border-2 border-brand-500 p-3.5 rounded-xl transition-all hover:border-brand-500 flex items-center justify-between group">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-7 h-7 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center text-xs font-bold font-mono">A1</span>
+                            <div>
+                                <span class="block text-xs font-bold text-white">North Corridor Express</span>
+                                <span class="text-[10px] text-gray-500 block font-mono">LGU Cam Node #042</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-md">60.4 fps</span>
+                    </button>
+
+                    <!-- Cam list item 2 -->
+                    <button onclick="selectCamera('B5')" id="cam-btn-B5" class="w-full text-left bg-gray-950/40 border border-gray-850 p-3.5 rounded-xl transition-all hover:border-gray-700 flex items-center justify-between group">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-7 h-7 rounded-lg bg-gray-850 text-gray-400 flex items-center justify-center text-xs font-bold font-mono">B5</span>
+                            <div>
+                                <span class="block text-xs font-bold text-gray-400 group-hover:text-white transition-colors">West Coastal Port</span>
+                                <span class="text-[10px] text-gray-600 block font-mono">DILG Cam Node #109</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono text-gray-600">30.0 fps</span>
+                    </button>
+
+                    <!-- Cam list item 3 -->
+                    <button onclick="selectCamera('C3')" id="cam-btn-C3" class="w-full text-left bg-gray-950/40 border border-gray-850 p-3.5 rounded-xl transition-all hover:border-gray-700 flex items-center justify-between group">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-7 h-7 rounded-lg bg-gray-850 text-gray-400 flex items-center justify-center text-xs font-bold font-mono">C3</span>
+                            <div>
+                                <span class="block text-xs font-bold text-gray-400 group-hover:text-white transition-colors">Main Arterial Tunnel</span>
+                                <span class="text-[10px] text-gray-600 block font-mono">CCTV Node #018</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono text-gray-600">Off-line</span>
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Right / Middle panel: The main layout showing interactive telemetry HUD -->
+        <section class="lg:col-span-8 flex flex-col space-y-4 h-full overflow-y-auto pl-1">
+            
+            <!-- ACTIVE LIVE STREAM CONTAINER -->
+            <div id="telemetry-screen-card" class="bg-gray-950 border border-gray-850 rounded-2xl overflow-hidden relative min-h-[380px] flex-1 flex flex-col shadow-2xl">
+                <!-- Top bar layout -->
+                <div class="bg-gray-900/60 px-5 py-3 border-b border-gray-850 flex items-center justify-between z-10">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                        <span class="text-xs text-white font-semibold font-mono uppercase tracking-wider" id="active-screen-title">Inference Layer Feed [A1]</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-[10px] font-mono text-gray-500 uppercase">Detection Confidence: 99.8%</span>
+                    </div>
+                </div>
+
+                <!-- Live Stream Video Panel Mock -->
+                <div class="relative flex-1 bg-slate-950 flex items-center justify-center overflow-hidden">
+                    
+                    <!-- Atmospheric bus traffic backdrop image inside interactive simulation -->
+                    <img id="inference-feed-img" src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=1200" alt="Active camera viewport telemetry" class="absolute inset-0 w-full h-full object-cover opacity-50 transition-all duration-500">
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/20 to-transparent"></div>
+                    <div class="absolute inset-0 hud-scanline opacity-25"></div>
+
+                    <!-- STEP 2 INTERACTIVE MOCK BOUNDING BOXES -->
+                    <div id="bounding-boxes-layer" class="absolute inset-0 pointer-events-none transition-all duration-300">
+                        <!-- Box 1 (Bus) -->
+                        <div class="absolute border-2 border-brand-500 bg-brand-500/10 rounded px-1.5 py-0.5" style="top: 28%; left: 15%; width: 200px; height: 110px;">
+                            <span class="absolute top-0 left-0 bg-brand-500 text-[9px] text-white font-mono px-1 rounded-sm -mt-3.5 whitespace-nowrap font-bold">BUS [98%] - 44 km/h</span>
+                        </div>
+                        <!-- Box 2 (Car) -->
+                        <div class="absolute border-2 border-accent-yellow bg-accent-yellow/10 rounded px-1.5 py-0.5" style="top: 50%; left: 55%; width: 120px; height: 80px;">
+                            <span class="absolute top-0 left-0 bg-accent-yellow text-[9px] text-black font-mono font-extrabold px-1 rounded-sm -mt-3.5 whitespace-nowrap">SEDAN [95%] - 62 km/h</span>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3 INTERACTIVE HEATMAP / FRICTION OVERLAYS -->
+                    <div id="friction-layer" class="absolute inset-0 bg-red-500/10 backdrop-blur-xs hidden transition-all duration-300">
+                        <!-- Double parking visual warning -->
+                        <div class="absolute border border-dashed border-red-500 bg-red-500/20 rounded-full p-4 flex flex-col justify-center items-center" style="top: 35%; left: 60%; width: 140px; height: 140px;">
+                            <span class="text-[10px] bg-red-600 text-white font-bold px-1.5 py-0.5 rounded font-mono uppercase tracking-wide">DOUBLE PARKED</span>
+                            <span class="text-[9px] text-gray-200 mt-1 font-mono text-center leading-none">Friction Index:<br><strong>High (9.2)</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Left Overlay HUD Metrics -->
+                    <div class="absolute bottom-5 left-5 right-5 grid grid-cols-2 sm:grid-cols-4 gap-3 z-10 pointer-events-none transition-opacity" id="telemetry-grid">
+                        <div class="bg-gray-950/80 backdrop-blur-md border border-gray-850 p-3 rounded-xl">
+                            <span class="block text-[9px] text-gray-500 uppercase font-mono">Flow (Vol/Hr)</span>
+                            <span class="text-base font-bold text-white font-mono" id="hud-val-vol">2,142 vph</span>
+                        </div>
+                        <div class="bg-gray-950/80 backdrop-blur-md border border-gray-850 p-3 rounded-xl">
+                            <span class="block text-[9px] text-gray-500 uppercase font-mono">Avg Speed Index</span>
+                            <span class="text-base font-bold text-accent-green font-mono" id="hud-val-speed">58.4 km/h</span>
+                        </div>
+                        <div class="bg-gray-950/80 backdrop-blur-md border border-gray-850 p-3 rounded-xl">
+                            <span class="block text-[9px] text-gray-500 uppercase font-mono">Heavy Vehicles %</span>
+                            <span class="text-base font-bold text-white font-mono" id="hud-val-heavy">22.4%</span>
+                        </div>
+                        <div class="bg-gray-950/80 backdrop-blur-md border border-gray-850 p-3 rounded-xl">
+                            <span class="block text-[9px] text-gray-500 uppercase font-mono">Road Friction Score</span>
+                            <span class="text-base font-bold text-accent-yellow font-mono" id="hud-val-friction">MODERATE (4.1)</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- EXCEL / PDF REPORT GENERATOR PANEL (FOR STEP 4) -->
+            <div id="report-generator-card" class="bg-gray-900/40 border border-gray-850 rounded-2xl p-5 space-y-4 transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold uppercase text-white tracking-wider">Automated Engineering Reports</h4>
+                        <span class="text-[10px] text-gray-500 block mt-0.5">Compliant with LGU and Civil Planning guidelines</span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <button onclick="downloadReport('PDF')" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all inline-flex items-center space-x-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            <span>Download PDF</span>
+                        </button>
+                        <button onclick="downloadReport('Excel')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all inline-flex items-center space-x-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span>Export Excel</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Interactive walkthrough notification overlay -->
+    <div id="step-toast-box" class="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-gray-900 border-l-4 border-brand-500 border-y border-r border-gray-800 p-4 rounded-r-xl shadow-2xl flex items-center space-x-3 pointer-events-auto transition-all transform translate-y-20 opacity-0">
+        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-brand-500/10 text-brand-500 flex items-center justify-center">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+        <div>
+            <p class="text-sm font-semibold text-white" id="step-toast-text">Analyzing Camera coordinates...</p>
+        </div>
+    </div>
+
+    <!-- Scripting walkthrough logic -->
+    <script>
+        // Guided Tour state database
+        const tourSteps = [
+            {
+                step: 1,
+                percentage: "25%",
+                title: "Inference Stream Discovery",
+                description: "Our intelligence engine instantly analyzes visual sources down to 99.8% precision. Explore the panel on the left, select <strong>Node A1</strong> or select another telemetry stream in the channel directory to see performance indicators.",
+                highlightCard: "cam-channel-card"
+            },
+            {
+                step: 2,
+                percentage: "50%",
+                title: "Live Object Classification & Speeds",
+                description: "Observe the live tracking overlays. Our deep learning engine identifies individual buses, sedans, trucks, and counts their speeds seamlessly to flag traffic speed parameters instantly.",
+                highlightCard: "telemetry-screen-card"
+            },
+            {
+                step: 3,
+                percentage: "75%",
+                title: "Roadside Friction Spotting",
+                description: "In addition to simple count metrics, RoadPulse maps <strong>Roadside Friction Indexes</strong>—highlighting illegally parked delivery trucks or street bottlenecks to help you evaluate real throughput safety.",
+                highlightCard: "telemetry-screen-card"
+            },
+            {
+                step: 4,
+                percentage: "100%",
+                title: "Automate Stakeholder Reports",
+                description: "To present data to municipalities or corporate planners, export our automatically compiled traffic audits. Choose <strong>Download PDF</strong> or <strong>Export Excel</strong> at the bottom of the screen.",
+                highlightCard: "report-generator-card"
+            }
+        ];
+
+        let currentTourIndex = 0;
+
+        window.onload = function() {
+            // Load custom Session Parameters if they exist
+            const userName = sessionStorage.getItem('rp_user_name') || 'Juan dela Cruz';
+            const userOrg = sessionStorage.getItem('rp_user_org') || 'LGU Coordinator';
+
+            document.getElementById('user-display-name').textContent = userName;
+            document.getElementById('user-display-org').textContent = userOrg;
+
+            showToastHUD("Welcome to RoadPulse Walkthrough Tutorial!");
+            renderStep();
+        };
+
+        function renderStep() {
+            const stepData = tourSteps[currentTourIndex];
+
+            // Render details
+            document.getElementById('step-label').textContent = `Demo Stage ${stepData.step} / 4`;
+            document.getElementById('tour-percentage').textContent = `${stepData.percentage} Complete`;
+            document.getElementById('step-title').textContent = stepData.title;
+            document.getElementById('step-description').innerHTML = stepData.description;
+
+            // Manage navigation button parameters
+            document.getElementById('prev-btn').disabled = (currentTourIndex === 0);
+            
+            if (currentTourIndex === tourSteps.length - 1) {
+                document.getElementById('next-btn').textContent = "Finish Walkthrough";
+            } else {
+                document.getElementById('next-btn').textContent = "Next Step →";
+            }
+
+            // Interactive simulation state triggers based on step index
+            if (currentTourIndex === 0) {
+                // Keep default viewport layout
+                document.getElementById('bounding-boxes-layer').classList.remove('opacity-0');
+                document.getElementById('friction-layer').classList.add('hidden');
+                document.getElementById('hud-val-friction').textContent = "MODERATE (4.1)";
+            } else if (currentTourIndex === 1) {
+                // Focus on Bounding Box logic and speed tracking
+                document.getElementById('bounding-boxes-layer').classList.remove('opacity-0');
+                document.getElementById('friction-layer').classList.add('hidden');
+            } else if (currentTourIndex === 2) {
+                // Trigger Friction Heatmap simulation layer overlay
+                document.getElementById('friction-layer').classList.remove('hidden');
+                document.getElementById('hud-val-friction').textContent = "CRITICAL (9.2)";
+                showToastHUD("Friction parameters loaded: Double Parked Bus detected.");
+            } else if (currentTourIndex === 3) {
+                // Direct focus to Report Generator
+                document.getElementById('friction-layer').classList.add('hidden');
+                showToastHUD("Report modules pre-compiled and ready.");
+            }
+        }
+
+        function nextStep() {
+            if (currentTourIndex < tourSteps.length - 1) {
+                currentTourIndex++;
+                renderStep();
+            } else {
+                // Tour Finished sequence
+                showToastHUD("Walkthrough Completed! Redirecting to landing page.");
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            }
+        }
+
+        function prevStep() {
+            if (currentTourIndex > 0) {
+                currentTourIndex--;
+                renderStep();
+            }
+        }
+
+        // Camera Channel switching logic
+        function selectCamera(node) {
+            showToastHUD(`Connecting to Camera Endpoint Cam_${node}...`);
+            
+            const titles = {
+                'A1': 'Inference Layer Feed [A1]',
+                'B5': 'West Coastal Port Port-side Telemetry [B5]',
+                'C3': 'Tunnel Emergency Grid [C3]'
+            };
+
+            const images = {
+                'A1': 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=1200',
+                'B5': 'https://images.unsplash.com/photo-1506012787146-f92b2d7d6d96?auto=format&fit=crop&q=80&w=1200',
+                'C3': 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&q=80&w=1200'
+            };
+
+            // Highlight chosen camera card
+            ['A1', 'B5', 'C3'].forEach(cam => {
+                const btn = document.getElementById(`cam-btn-${cam}`);
+                if (cam === node) {
+                    btn.classList.add('border-brand-500', 'bg-gray-950/80');
+                    btn.classList.remove('border-gray-850', 'bg-gray-950/40');
+                } else {
+                    btn.classList.remove('border-brand-500', 'bg-gray-950/80');
+                    btn.classList.add('border-gray-850', 'bg-gray-950/40');
+                }
+            });
+
+            document.getElementById('active-screen-title').textContent = titles[node];
+            document.getElementById('inference-feed-img').src = images[node];
+
+            // Update parameters inside dashboard
+            if (node === 'B5') {
+                document.getElementById('hud-val-vol').textContent = '1,450 vph';
+                document.getElementById('hud-val-speed').textContent = '42.2 km/h';
+                document.getElementById('hud-val-heavy').textContent = '40.8%';
+            } else if (node === 'A1') {
+                document.getElementById('hud-val-vol').textContent = '2,142 vph';
+                document.getElementById('hud-val-speed').textContent = '58.4 km/h';
+                document.getElementById('hud-val-heavy').textContent = '22.4%';
+            } else {
+                document.getElementById('hud-val-vol').textContent = '840 vph';
+                document.getElementById('hud-val-speed').textContent = '65.0 km/h';
+                document.getElementById('hud-val-heavy').textContent = '5.2%';
+            }
+        }
+
+        // Report download simulator
+        function downloadReport(format) {
+            showToastHUD(`Generating Automated ${format} Report...`);
+            setTimeout(() => {
+                showToastHUD(`${format} Report Saved Successfully to Downloads!`);
+            }, 1200);
+        }
+
+        // Custom premium toast notifications
+        function showToastHUD(message) {
+            const toast = document.getElementById('step-toast-box');
+            document.getElementById('step-toast-text').innerHTML = message;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
